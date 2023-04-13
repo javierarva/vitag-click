@@ -1,0 +1,88 @@
+{% extends 'home/components/layout.html.twig' %}
+
+{% block title %}Vitag Click - Home{% endblock %}
+
+{% block content %}
+
+<style>
+
+#tagContainer select {
+	width: 20%;
+	padding: 5px;
+	line-height: 1.5;
+	color: #212529;
+	background-color: #fff;
+	border: 1px solid #ced4da;
+	border-radius: .25rem;
+    text-align: center;
+  }
+
+#button-container button {
+	border: 1px solid transparent;
+	border-radius: 0.25rem;
+	padding: 0.375rem 0.75rem;
+	text-decoration: none;
+	font-size: 16px;
+	cursor: pointer;
+	color: #fff;
+	background: #138496!important;
+}
+
+#button-container button:hover {
+	transition: 0.4s;
+	filter: brightness(90%); 
+}
+
+@media only screen and (max-width: 768px) {
+
+    #controls {
+        padding: 0px;
+    }
+
+    #controls table {
+        font-size: 13px;
+    }
+
+    #parent-dropdown {
+        width: 50%!important;
+    }
+}
+</style>
+
+    <h1 class="titleView">Cronoetiquetador Vitag</h1>
+
+    <div id="controls">
+        <p id="time">00:00:00</p>
+        <button class="Btn btnPrimary" type="button" id="markBtn" disabled onclick="mark()">Marca</button>
+        <br>
+        <table>
+            <thead>
+            <tr>
+                <th>Tiempo de Marca</th>
+                <th>Fecha</th>
+                <th>Categoría</th>
+                <th>Etiqueta</th>
+            </tr>
+            </thead>
+            <tbody id="marks"></tbody>
+        </table>
+        <br>
+        <div id="markTime"></div>
+        <div id="divButtons">
+            <button class="Btn btnSecondary" id="startBtn" onclick="start()">Comenzar</button>
+            <button class="Btn btnDanger" id="stopBtn" onclick="stop()">Parar</button>
+            <button class="Btn btnPrimary" id="restartBtn" onclick="restart()">Reiniciar</button>
+        </div>
+
+        <div id="tagContainer" style="padding:20px;">
+            <select id="parent-dropdown" onchange="changeParent()">
+                <option selected="selected">Escoge Categoría</option>
+                <option value="Básica">Básica</option>
+                <option value="Jugadas Balón">Jugadas Balón</option>
+            </select>
+
+            <div id="button-container" style="margin-top:20px;gap:5px;display:flex;justify-content:center;flex-wrap:wrap;"></div>
+        </div>
+    </div>
+
+{% endblock %}

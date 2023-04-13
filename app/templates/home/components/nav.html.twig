@@ -1,0 +1,73 @@
+<div class="navi animate__animated animate__fadeInDown">
+    <div class="logo">
+        <img onclick="window.location.href='{{ path('app_home') }}'" src="/img/vclogo.svg" alt="Ir al home">
+    </div>
+    <div class="navm">
+        <!--<ul class="nav__list">
+            <li><a href="{{ path('app_home') }}">Home</a>
+                <ul><li><a href="{{ path('app_home') }}">Home</a></li></ul>-->
+            </li>
+        </ul-->
+    </div>
+    <div class="avatar">
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            <div class="navm">
+                <ul class="nav__list">
+                    <li>
+                        {% if app.user.avatar %}
+                            <img src="/img/avatars/{{ app.user.avatar }}" class="avatarimg" alt="Menú de usuario">
+                        {% else %}
+                            <img src="/img/default-avatar.svg" class="avatarimg svgAvatar" alt="Menú de usuario">
+                        {% endif %}
+                        <ul>
+                            <li><a href="{{ path('app_home') }}">Mi Cuenta</a></li>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li><a href="{{ path('app_home') }}">Panel de Administración</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        {% else %}
+            <!--
+            <a href="{{ path('app_home') }}">INICIAR SESIÓN</a>
+            <a href="{{ path('app_home') }}">REGISTRARSE</a>-->
+        {% endif %}
+
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            <a class="Btn btnSecondary" href="{{ path('app_home') }}">CERRAR SESIÓN</a>
+        {% endif %}
+    </div>
+
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        {% if app.user.avatar %}
+            <img src="/img/avatars/{{ app.user.avatar }}" style="display:none;" class="avatarimg" alt="Avatar de usuario">
+        {% else %}
+            <img src="/img/default-avatar.svg" style="display:none;" class="avatarimg svgAvatar" alt="Avatar por defecto de usuario">
+        {% endif %}
+    {% endif %}
+    
+    <span class="button-nav" alt="Menú" onclick="openNav()">&#9776;</span>
+</div>
+
+<div id="myNav-mobile" class="overlay">
+    <div class="closebtn" onclick="closeNav()">&times;</div>
+    <div class="overlay-content">
+        <ul class="nav__list-mobile">
+            <li><a href="{{ path('app_home') }}">Home</a></li>
+        </ul>
+        <br><br>
+        <ul style="margin-top:20px;" class="nav__list-mobile">
+            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                <li><a href="{{ path('app_home') }}">Mi Cuenta</a></li>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <li><a href="{{ path('app_home') }}">Panel de Administración</a></li>
+                {% endif %}
+                <li><a href="{{ path('app_home') }}">Cerrar Sesión</a></li>
+            {% else %}
+                <li><a href="{{ path('app_home') }}">Iniciar Sesión</a></li>
+                <li><a href="{{ path('app_home') }}">Registrarse</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</div>

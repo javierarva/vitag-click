@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no minimal-ui">
+        <meta name="description" content="Vitag Click">
+        <meta name="robots" content="noindex">
+        <meta name="AdsBot-Google" content="noindex">
+        <meta name="googlebot" content="noindex">
+        <meta name="googlebot-news" content="noindex">
+        <title>{% block title %}Vitag Click{% endblock %}</title>
+        <link rel="icon" href="img/favicon.png" sizes="any" type="image/svg+xml">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+    </head>
+
+    <body>
+    
+    {% block body %}{% endblock %}
+
+    {% block footer %}
+
+        <footer class="footer">
+            <div class="titlef">
+                <span><button aria-label="Subir arriba" id="scrollButton" class="animate__animated"><svg alt="Subir arriba" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M374.6 246.6C368.4 252.9 360.2 256 352 256s-16.38-3.125-22.62-9.375L224 141.3V448c0 17.69-14.33 31.1-31.1 31.1S160 465.7 160 448V141.3L54.63 246.6c-12.5 12.5-32.75 12.5-45.25 0s-12.5-32.75 0-45.25l160-160c12.5-12.5 32.75-12.5 45.25 0l160 160C387.1 213.9 387.1 234.1 374.6 246.6z"/></svg></button></span>
+            </div>
+            <div class="containerf">
+                <div class="contentf">
+                    <div class="desc">
+                        <h3>Vitag Click</h3>
+                        <hr>
+                        <p>Vitag click es un cronoetiquetador para registrar marcas en tus vídeos.</p>
+                    </div>
+                <div class="link">
+                    <h3>Links Útiles</h3>
+                    <hr>
+                    <button class="linkButton" aria-label="Mi cuenta" onclick="window.location.href='{{ path('app_home') }}'">Home</button>
+                </div>
+            </div>
+            <div class="copyf">
+                <p>© 2023 Todos los derechos reservados - Vitag Click</p>
+            </div>
+        </footer>
+        
+    {% endblock %}
+
+    </body>
+
+    {% block javascripts %}
+
+    <script>
+
+        var btn = document.getElementById("scrollButton");
+
+        btn.addEventListener("click", () => {
+            var count = 0;
+            var x = setInterval(function() {
+                'use strict';
+                window.scrollTo(0,scrollY-count);
+                count++
+                if (scrollY == 0) {
+                    clearInterval(x)
+                }
+            }, 20);
+        });
+
+        function openNav() {
+            document.getElementById("myNav-mobile").style.width = "100%";
+        }
+        
+        function closeNav() {
+            document.getElementById("myNav-mobile").style.width = "0%";
+        }
+
+        var startTime, timer, marks = [];
+        var isPaused = false;
+        var totalTimeElapsed = 0;
+
+        function start() {
+            document.getElementById("markBtn").disabled = false;
+
+            startTime = Date.now() - (marks.length > 0 ? marks[marks.length - 1].time : 0);
+            timer = setInterval(function() {
+                var elapsedTime = Date.now() - startTime;
+                var minutes = Math.floor((elapsedTime / 1000 / 60) % 60).toString().padStart(2, '0');
+                var seconds = Math.floor((elapsedTime / 1000) % 60).toString().padStart(2, '0');
+                var milliseconds = Math.floor((elapsedTime % 1000) / 10).toString().padStart(2, '0');
+                document.getElementById("time").innerHTML = `${minutes}:${seconds}:${milliseconds}`;
+            }, 10);
+            
+            document.getElementById("startBtn").disabled = true;
+        }
+
+        function stop() {
+            clearInterval(timer);
+
+            document.getElementById("stopBtn").disabled = true;
+            document.getElementById("markBtn").disabled = true;
+
+            pauseTime = Date.now();
+
+            if (!isPaused) {
+                var resumeBtn = document.createElement("button");
+                resumeBtn.id = "resumeBtn";
+                resumeBtn.innerText = "Reanudar";
+                resumeBtn.addEventListener("click", resume);
+                document.getElementById("controls").appendChild(resumeBtn);
+                isPaused = true;
+            }
+        }
+
+        function resume() {
+            document.getElementById("stopBtn").disabled = false;
+            document.getElementById("markBtn").disabled = false;
+
+            var timeNow = Date.now();
+            if (marks.length > 0) {
+                var elapsedTime = marks[0].time;
+                for (var i = 1; i < marks.length; i++) {
+                elapsedTime += marks[i].time - marks[i - 1].time;
+                }
+                elapsedTime += timeNow - pauseTime;
+            } else {
+                elapsedTime = timeNow - startTime;
+            }
+            startTime = timeNow - elapsedTime;
+            timer = setInterval(function() {
+                elapsedTime = Date.now() - startTime;
+                var minutes = Math.floor((elapsedTime / 1000 / 60) % 60).toString().padStart(2, '0');
+                var seconds = Math.floor((elapsedTime / 1000) % 60).toString().padStart(2, '0');
+                var milliseconds = Math.floor((elapsedTime % 1000) / 10).toString().padStart(2, '0');
+                document.getElementById("time").innerHTML = `${minutes}:${seconds}:${milliseconds}`;
+            }, 10);
+            document.getElementById("controls").removeChild(document.getElementById("resumeBtn"));
+            isPaused = false;
+        }
+
+        var selectedTag = "";
+
+        function changeParent() {
+            const parent = document.getElementById("parent-dropdown").value;
+            const buttonContainer = document.getElementById("button-container");
+
+            buttonContainer.innerHTML = "";
+
+            if (parent === "Básica") {
+                addButton("Ok", "Ok");
+                addButton("Capítulo", "Capítulo");
+                addButton("Revisar", "Revisar");
+                addButton("Mal", "Mal");
+                addButton("Anotar", "Anotar");
+                addButton("Importante", "Importante");
+                addButton("Favorito", "Favorito");
+
+            } else if (parent === "Jugadas Balón") {
+                addButton("Repetición Jugada", "Repetición Jugada");
+                addButton("Parada", "Parada");
+                addButton("Tarjeta Roja", "Tarjeta Roja");
+                addButton("Tarjeta Amarilla", "Tarjeta Amarilla");
+                addButton("Pase", "Pase");
+                addButton("Pérdida", "Pérdida");
+                addButton("Gol", "Gol");
+            }
+
+            const tagButtons = document.querySelectorAll("#button-container button");
+            tagButtons.forEach(function (button) {
+                button.addEventListener("click", function () {
+                    selectedTag = button.value;
+                });
+            });
+        }
+
+        function addButton(label, tag) {
+            const button = document.createElement("button");
+            button.innerText = label;
+            button.setAttribute("value", tag);
+            button.addEventListener("click", handleButtonClick);
+            document.getElementById("button-container").appendChild(button);
+        }
+
+        function handleButtonClick(event) {
+            const tag = event.target.getAttribute("value");
+        }
+
+        function mark() {
+            var elapsedTime = Date.now() - startTime;
+            
+            var selectedParent = document.getElementById("parent-dropdown").value;
+            var tag = selectedTag;    
+
+            var mark = {
+                time: elapsedTime,
+                date: new Date().toLocaleString(),
+                parent: selectedParent,
+                tag: tag
+            };
+            
+            marks.push(mark);
+            
+            var row = document.createElement("tr");
+            
+            var timeCell = document.createElement("td");
+            var seconds = Math.floor(mark.time / 1000) % 60;
+            var milliseconds = Math.floor((mark.time % 1000) / 10).toString().padStart(2, '0');
+            timeCell.innerText = `${seconds}.${milliseconds}`;
+            row.appendChild(timeCell);
+            
+            var dateCell = document.createElement("td");
+            dateCell.innerText = mark.date;
+            row.appendChild(dateCell);
+            
+            var parentCell = document.createElement("td");
+            parentCell.innerText = mark.parent;
+            row.appendChild(parentCell);
+            
+            var tagCell = document.createElement("td");
+            tagCell.innerText = mark.tag;
+            row.appendChild(tagCell);
+            
+            document.getElementById("marks").appendChild(row);
+
+            var downloadBtn = document.getElementById("downloadBtn");
+            if (marks.length > 0 && !downloadBtn) {
+                var downloadBtn = document.createElement("button");
+                downloadBtn.id = "downloadBtn";
+                downloadBtn.innerText = "Descargar Marcas";
+                downloadBtn.addEventListener("click", downloadMarks);
+                document.getElementById("controls").appendChild(downloadBtn);
+            }
+        }
+
+        function downloadMarks() {
+            var csv = "Time,Title,Parent,Tag\n";
+            for (var i = 0; i < marks.length; i++) {
+                var mark = marks[i];
+                var hours = Math.floor(mark.time / 3600000).toString().padStart(2, '0');
+                var minutes = Math.floor((mark.time % 3600000) / 60000).toString().padStart(2, '0');
+                var seconds = Math.floor((mark.time % 60000) / 1000).toString().padStart(2, '0');
+                var time = `${hours}:${minutes}:${seconds}`;
+                var title = mark.tag;
+                csv += `${time},${title},${mark.parent},${mark.tag}\n`;
+            }
+            var filename = "marks.csv";
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            if (navigator.msSaveBlob) {
+                navigator.msSaveBlob(blob, filename);
+            } else {
+                var link = document.createElement("a");
+                if (link.download !== undefined) {
+                var url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                }
+            }
+        }
+
+        function restart() {
+            document.getElementById("time").innerHTML = "00:00:00";
+            marks = [];
+            document.getElementById("markBtn").disabled = true;
+            stop();
+
+            document.getElementById("stopBtn").disabled = false;
+
+            document.getElementById("startBtn").disabled = false;
+
+            document.getElementById("marks").innerHTML = "";
+
+            var downloadBtn = document.getElementById("downloadBtn");
+            if (downloadBtn) {
+                downloadBtn.remove();
+            }
+
+            var resumeBtn = document.getElementById("resumeBtn");
+            if (resumeBtn) {
+                resumeBtn.parentNode.removeChild(resumeBtn);
+            }
+
+            isPaused = false;
+        }
+
+    </script>
+
+{% endblock %}
+</html>
